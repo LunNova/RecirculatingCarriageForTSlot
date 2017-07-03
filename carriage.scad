@@ -1,9 +1,9 @@
-ball_d=9.2;
-extra_tolerance=0.2;
+ball_d=9.15;
+extra_tolerance=0.15;
 ball_r_2=(ball_d/2)*(ball_d/2);
 race_r = ball_d/3;
 
-length=59.9;
+length=60.2;
 thickness=2;
 slot_width=6;
 $fn=50;
@@ -24,11 +24,15 @@ module race_2dp(tol=0) {
                 square([ball_d+thickness*2, ball_d+thickness*2], center=true);
             }
             circle(d=(ball_d+tol)/fudge(), center=true);
-            //x=ball_d/4;
-            //translate([0, ball_d/2-x*0.29]) polygon([[-x, 0], [x, 0], [0, x*2/4]]);
-            //z=ball_d*3/8;
-            //translate([0, ball_d*2/6]) polygon([[-z, 0], [z, 0], [0, z*2/3]]);
         }
+    }
+}
+
+module tolerance_gradual(tol) {
+    if (tol != 0) {
+        l=tol*6;
+        translate([race_r+(ball_d+thickness*2)/2, length/2-l/2+0.0001, 0])
+        rotate([90, 0, 0]) cylinder(d2=ball_d/fudge(), d1=(ball_d+tol)/fudge(), h=l, center=true);
     }
 }
 
@@ -56,15 +60,13 @@ module race_slotted() {
         translate([c[0]/2+ball_d*3/4, 0, c[2]/2+slot_width/2]) cube(c, center=true);
         translate([0, 0, c[2]/2+ball_d*2/5]) cube(c, center=true);
         translate([c[0]/2+ball_d*3/4, 0, -(c[2]/2+slot_width/2)]) cube(c, center=true);
-        //translate([-c[0]/2+ball_d*3/4, 0, c[2]/2+slot_width/2]) cube(c, center=true);
         for (i = [-hole_spacing : hole_spacing : hole_spacing]) {
             translate([0, i, 0])
             cylinder(d=hole_d/fudge(),h=ball_d*2, center=true);
         }
+        tolerance_gradual(extra_tolerance);
+        mirror([0, 1, 0]) tolerance_gradual(extra_tolerance);
     }
 }
-
-//translate([0, ball_d*2]) race_2dp();
-//race_2dp(extra_tolerance);
 
 race_slotted();
