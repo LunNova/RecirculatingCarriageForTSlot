@@ -10,9 +10,11 @@ $fn=50;
 hole_d=5;
 hole_spacing=30;
 
-c_offset = 24;
-above_gap=0.5;
+c_offset = 21.5 + race_r;
+echo(c_offset);
+above_gap=1.5;
 gap=13.5+above_gap;
+top_h=12;
 
 function fudge() = cos(180/$fn);
 function hole_slip(d) = d*(5.3/5)*fudge();
@@ -62,7 +64,7 @@ module race_3d() {
 
 module holes() {
     for (i = [-hole_spacing : hole_spacing : hole_spacing]) {
-        translate([(i==0?-1:1)*4, i, 0])
+        translate([(i==0?-1:1)*3.5, i, 0])
         cylinder(d=hole_slip(hole_d),h=100, center=true);
     }
 }
@@ -84,10 +86,10 @@ module race_slotted() {
 translate([80, 0, 0]) race_slotted();
 
 %preview();
-translate([0, 0, 15+5+above_gap]) top();
+translate([0, 0, 15+above_gap]) top();
 
 module side() {
-    render() linear_extrude(height=gap+4, center=true) projection(cut=true) render() translate([0, 0, 5]) race_slotted();
+    translate([0, 0, top_h/2]) render() linear_extrude(height=gap+top_h, center=true) projection(cut=true) render() translate([0, 0, 5]) race_slotted();
 }
 
 module preview() {
@@ -105,9 +107,9 @@ module top() {
     d=(c_offset+hole_d)*2+1;
     difference() {
         union() {
-            cube([d, length+2*(race_r+ball_d+thickness), 8], center=true);
-            translate([-c_offset,0,-gap/2+2]) side();
-            rotate(180) translate([-c_offset,0,-gap/2+2]) side();
+            translate([0, 0, top_h/2]) cube([d, length+2*(race_r+ball_d+thickness), top_h], center=true);
+            translate([-c_offset,0,-gap/2]) side();
+            rotate(180) translate([-c_offset,0,-gap/2]) side();
             /*translate([-c_offset,0,-gap/2]) cube([hole_d*2+1, length, gap], center=true);
             rotate(180) translate([-c_offset,0,-gap/2]) cube([hole_d*2+1, length, gap], center=true);*/
         }
